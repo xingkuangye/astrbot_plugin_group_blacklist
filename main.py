@@ -19,11 +19,10 @@ class MyPlugin(Star):
         self.blacklist = [str(u) for u in config.get("blacklist", []) or []]
         
 
-    async def initialize(self, context: Context ):
+    async def initialize(self):
         """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
         for user_id in self.blacklist:
             await self.put_kv_data(user_id, True)
-
         
 
     @filter.platform_adapter_type(PlatformAdapterType.AIOCQHTTP)
@@ -53,6 +52,7 @@ class MyPlugin(Star):
             else:
                 logger.debug(f"群 {group_id} 不在监控列表中，忽略该加群请求")
 
+
     @filter.platform_adapter_type(PlatformAdapterType.AIOCQHTTP)
     @filter.event_message_type(filter.EventMessageType.ALL, priority=10)
     async def groupout(self, event: AstrMessageEvent):
@@ -71,7 +71,3 @@ class MyPlugin(Star):
                     operator_id = get_value(raw_message, "operator_id")
                     logger.info(f"用户 {user_id} 被管理员 {operator_id} 踢出了群 {group_id}")
                     await self.put_kv_data(user_id, True)
-                
-
-    async def terminate(self):
-        """可选择实现异步的插件销毁方法，当插件被卸载/停用时会调用。"""
