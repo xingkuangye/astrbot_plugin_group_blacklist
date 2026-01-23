@@ -13,15 +13,18 @@ def get_value(obj, key, default=None):
 
 @register("Group_Blacklist", "星星旁の旷野", "群黑名单插件", "0.1.0")
 class MyPlugin(Star):
-    def __init__(self, context: Context):
+    def __init__(self, context: Context, config: dict = None):
         super().__init__(context)
-
-    async def initialize(self, config: dict = None):
-        """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
         self.detect_groups = [str(g) for g in config.get("detect_groups", []) or []]
         self.blacklist = [str(u) for u in config.get("blacklist", []) or []]
+        
+
+    async def initialize(self, context: Context ):
+        """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
         for user_id in self.blacklist:
             await self.put_kv_data(user_id, True)
+
+        
 
     @filter.platform_adapter_type(PlatformAdapterType.AIOCQHTTP)
     @filter.event_message_type(filter.EventMessageType.ALL, priority=10)
