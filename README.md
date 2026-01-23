@@ -33,6 +33,3 @@ Place a config file `group_blacklist.json` or merge into bot config:
 
 ## Contributing
 Open an issue or PR with improvements or bug fixes.
-
-## License
-MIT
