@@ -1,0 +1,10 @@
+{
+  "detect_groups": {
+    "description": "要监控的群号",
+    "type": "list"
+  },
+  "blacklist": {
+    "description": "黑名单用户ID列表",
+    "type": "list"
+  }
+}
