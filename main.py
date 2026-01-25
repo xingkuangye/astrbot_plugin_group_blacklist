@@ -25,7 +25,7 @@ class MyPlugin(Star):
     @filter.command("unban")
     async def unban(self, event: AstrMessageEvent,user_id: int):
         """将用户从黑名单中移除"""
-        await self.get_kv_data(user_id, False)
+        await self.put_kv_data(user_id, False)
         yield event.plain_result(f" 已将 {user_id} 移出黑名单!")
 
     @filter.permission_type(filter.PermissionType.ADMIN)
@@ -60,7 +60,7 @@ class MyPlugin(Star):
                 flag= get_value(raw_message, "flag")
                 logger.debug(f"用户 {user_id} 申请加入群 {group_id}")
                 if str(group_id) in self.detect_groups:
-                    user_status = await self.get_kv_data(user_id)
+                    user_status = await self.get_kv_data(user_id,False)
                     if user_status:
                         logger.debug(f"用户 {user_id} 在黑名单中，拒绝加群请求")
                         client = event.bot
