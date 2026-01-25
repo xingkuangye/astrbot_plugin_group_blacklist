@@ -26,14 +26,14 @@ class MyPlugin(Star):
     async def unban(self, event: AstrMessageEvent,user_id: int):
         """将用户从黑名单中移除"""
         await self.get_kv_data(user_id, False)
-        yield event.plain_result(f"已将 {user_id} 移出黑名单!")
+        yield event.plain_result(f" 已将 {user_id} 移出黑名单!")
 
     @filter.permission_type(filter.PermissionType.ADMIN)
     @filter.command("ban")
     async def ban(self, event: AstrMessageEvent,user_id: int):
         """将用户加入黑名单"""
         await self.put_kv_data(user_id, True)
-        yield event.plain_result(f"已将 {user_id} 加入黑名单!\n注意：该用户若已在群内不会被自动踢出，仅会被拒绝加群请求。")
+        yield event.plain_result(f" 已将 {user_id} 加入黑名单!\n注意：该用户若已在群内不会被自动踢出，仅会被拒绝加群请求。")
 
     @filter.permission_type(filter.PermissionType.ADMIN)
     @filter.command("refresh")
@@ -41,7 +41,7 @@ class MyPlugin(Star):
         """刷新黑名单缓存"""
         for user_id in self.blacklist:
             await self.put_kv_data(user_id, True)
-        yield event.plain_result(f"已刷新黑名单缓存，共 {len(self.blacklist)} 个用户被加入黑名单!")
+        yield event.plain_result(f" 已刷新黑名单缓存，共 {len(self.blacklist)} 个用户被加入黑名单!")
 
     @filter.platform_adapter_type(PlatformAdapterType.AIOCQHTTP)
     @filter.event_message_type(filter.EventMessageType.ALL, priority=10)
@@ -109,4 +109,6 @@ class MyPlugin(Star):
                     elif sub_type == "kick":
                         operator_id = get_value(raw_message, "operator_id")
                         logger.info(f"用户 {user_id} 被管理员 {operator_id} 踢出了群 {group_id}")
+                        client = event.bot
+                        await client.api.call_action('send_group_msg',group_id=int(group_id),message=f"用户 {user_id} 被管理员踢出了群\n已自动加入全群黑名单")
                         await self.put_kv_data(user_id, True)
