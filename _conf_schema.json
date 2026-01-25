@@ -6,5 +6,9 @@
   "blacklist": {
     "description": "黑名单用户ID列表",
     "type": "list"
+  },
+  "target_groups": {
+    "description": "目标群组ID列表，用于通知拒绝加群请求",
+    "type": "list"
   }
 }
