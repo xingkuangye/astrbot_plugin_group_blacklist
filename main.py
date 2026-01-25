@@ -60,7 +60,7 @@ class MyPlugin(Star):
                 flag= get_value(raw_message, "flag")
                 logger.debug(f"用户 {user_id} 申请加入群 {group_id}")
                 if str(group_id) in self.detect_groups:
-                    user_status = await self.get_kv_data(user_id, False)
+                    user_status = await self.get_kv_data(user_id)
                     if user_status:
                         logger.debug(f"用户 {user_id} 在黑名单中，拒绝加群请求")
                         client = event.bot
