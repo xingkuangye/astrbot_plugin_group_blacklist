@@ -40,6 +40,7 @@ class MyPlugin(Star):
     async def refresh(self, event: AstrMessageEvent):
         """刷新黑名单缓存"""
         for user_id in self.blacklist:
+            user_id = int(user_id)
             await self.put_kv_data(user_id, True)
         yield event.plain_result(f" 已刷新黑名单缓存，共 {len(self.blacklist)} 个用户被加入黑名单!")
 
@@ -55,7 +56,7 @@ class MyPlugin(Star):
             if get_value(raw_message, "request_type") == "group":
                 logger.debug(f"收到加群请求事件，将由本插件处理")
                 group_id = get_value(raw_message, "group_id")
-                user_id = get_value(raw_message, "user_id")
+                user_id = int(get_value(raw_message, "user_id"))
                 flag= get_value(raw_message, "flag")
                 logger.debug(f"用户 {user_id} 申请加入群 {group_id}")
                 if str(group_id) in self.detect_groups:
@@ -99,7 +100,7 @@ class MyPlugin(Star):
         post_type = get_value(raw_message, "post_type")
         if post_type == "notice" :
             if get_value(raw_message, "notice_type") == "group_decrease":
-                user_id = get_value(raw_message, "user_id")
+                user_id = int(get_value(raw_message, "user_id"))
                 group_id = get_value(raw_message, "group_id")
                 sub_type = get_value(raw_message, "sub_type")
                 if str(group_id) in self.detect_groups:
