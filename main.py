@@ -111,5 +111,7 @@ class MyPlugin(Star):
                         operator_id = get_value(raw_message, "operator_id")
                         logger.info(f"用户 {user_id} 被管理员 {operator_id} 踢出了群 {group_id}")
                         client = event.bot
-                        await client.api.call_action('send_group_msg',group_id=int(group_id),message=f"用户 {user_id} 被管理员踢出了群\n已自动加入全群黑名单")
+                        for target_group in self.targets_groups:
+                            logger.debug(f"正在将消息转发至群 {target_group}")
+                            await client.api.call_action('send_group_msg',group_id=int(target_group),message=f"用户 {user_id} 被管理员踢出了群{group_id}\n已自动加入全群黑名单\n如需解封请管理员发送\"/unban {user_id}\"")
                         await self.put_kv_data(user_id, True)
