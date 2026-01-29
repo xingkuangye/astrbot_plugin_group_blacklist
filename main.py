@@ -20,6 +20,7 @@ class MyPlugin(Star):
         self.detect_groups = [str(g) for g in config.get("detect_groups", []) or []]
         self.blacklist = [str(u) for u in config.get("blacklist", []) or []]
         self.targets_groups = [str(g) for g in config.get("target_groups", []) or []]
+        self.notice_group = config.get("group_request_notice_group",None)
 
     @filter.permission_type(filter.PermissionType.ADMIN)
     @filter.command("unban")
@@ -43,6 +44,28 @@ class MyPlugin(Star):
             user_id = int(user_id)
             await self.put_kv_data(user_id, True)
         yield event.plain_result(f" 已刷新黑名单缓存，共 {len(self.blacklist)} 个用户被加入黑名单!")
+
+    @filter.permission_type(filter.PermissionType.ADMIN)
+    @filter.command("checkban")
+    async def checkban(self, event: AstrMessageEvent, user_id: int):
+        """检查用户是否在黑名单中"""
+        user_status = await self.get_kv_data(user_id, False)
+        if user_status:
+            yield event.plain_result(f"用户 {user_id} 在黑名单中。")
+        else:
+            yield event.plain_result(f"用户 {user_id} 不在黑名单中。")
+
+    @filter.permission_type(filter.PermissionType.ADMIN)
+    @filter.command("allow")
+    async def allow(self, event: AstrMessageEvent, flag: str):
+        """快捷同意加群请求"""
+        client = event.bot
+        try:
+            await client.api.call_action('set_group_add_request', flag=flag, approve=True)
+            yield event.plain_result(f"已同意加群请求。")
+        except Exception as e:
+            logger.error(f"同意加群请求时出错: {e}")
+            yield event.plain_result(f"同意加群请求时出错: {e}")
 
     @filter.platform_adapter_type(PlatformAdapterType.AIOCQHTTP)
     @filter.event_message_type(filter.EventMessageType.ALL, priority=10)
@@ -88,6 +111,35 @@ class MyPlugin(Star):
                             logger.error(f"拒绝加群请求时出错: {e}")
                     else:
                         logger.debug(f"用户 {user_id} 不在黑名单中，允许加群请求")
+                        logger.info(f"发送入群申请快捷处理条给目标用户")
+                        client = event.bot
+                        try:
+                            group_info = await client.api.call_action('get_group_info', group_id=int(group_id))
+                            group_name = group_info.get('group_name', group_name)
+
+                            for notice_group in self.notice_group:
+                                logger.debug(f"正在发送加群请求通知给用户 {notice_group}")
+                                await client.api.call_action(
+                                    'send_group_msg',
+                                    group_id=int(notice_group),
+                                    message=f'''用户 {user_id} 申请加入群 {group_name}。\n
+                                        如需同意该请求，请点击下方 +1'''
+                                )
+
+                                # 发送两次以自动产生 +1 按钮
+                                await client.api.call_action(
+                                    'send_group_msg',
+                                    group_id=int(notice_group),
+                                    message=f'''/allow {flag}'''
+                                )
+                                await client.api.call_action(
+                                    'send_group_msg',
+                                    group_id=int(notice_group),
+                                    message=f'''/allow {flag}'''
+                                )
+
+                        except Exception as e:
+                            logger.error(f"发送加群请求通知时出错: {e}")
                 else:
                     logger.debug(f"群 {group_id} 不在监控列表中，忽略该加群请求")
 
