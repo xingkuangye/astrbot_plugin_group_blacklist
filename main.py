@@ -115,6 +115,7 @@ class MyPlugin(Star):
                         client = event.bot
                         try:
                             group_info = await client.api.call_action('get_group_info', group_id=int(group_id))
+                            group_name = str(group_id)
                             group_name = group_info.get('group_name', group_name)
 
                             for notice_group in self.notice_group:
