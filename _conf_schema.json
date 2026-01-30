@@ -11,7 +11,7 @@
     "description": "目标群组ID列表，用于通知拒绝加群请求",
     "type": "list"
   },
-  "group_request_notice_group": {
+  "group_request_notice_groups": {
     "description": "接收加群请求通知的群组ID",
     "type": "list"
   }

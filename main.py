@@ -22,7 +22,7 @@ class MyPlugin(Star):
         self.detect_groups = [str(g) for g in config.get("detect_groups", []) or []]
         self.blacklist = [str(u) for u in config.get("blacklist", []) or []]
         self.targets_groups = [str(g) for g in config.get("target_groups", []) or []]
-        self.notice_groups = [str(g) for g in config.get("group_request_notice_group", []) or []]
+        self.notice_groups = [str(g) for g in config.get("group_request_notice_groups", []) or []]
     
 
     @filter.permission_type(filter.PermissionType.ADMIN)
