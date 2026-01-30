@@ -22,7 +22,7 @@ class MyPlugin(Star):
         self.detect_groups = [str(g) for g in config.get("detect_groups", []) or []]
         self.blacklist = [str(u) for u in config.get("blacklist", []) or []]
         self.targets_groups = [str(g) for g in config.get("target_groups", []) or []]
-        self.notice_group = [int(g) for g in config.get("group_request_notice_group", []) or []]
+        self.notice_groups = [str(g) for g in config.get("group_request_notice_group", []) or []]
     
 
     @filter.permission_type(filter.PermissionType.ADMIN)
@@ -164,7 +164,7 @@ class MyPlugin(Star):
                             group_name = str(group_id)
                             group_name = group_info.get('group_name', group_name)
 
-                            for notice_group in self.notice_group:
+                            for notice_group in self.notice_groups:
                                 logger.debug(f"正在发送加群请求通知给用户 {notice_group}")
                                 await client.api.call_action(
                                     'send_group_msg',
