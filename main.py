@@ -29,8 +29,11 @@ class MyPlugin(Star):
     @filter.command("unban")
     async def unban(self, event: AstrMessageEvent,ban_user_id: int):
         """将用户从黑名单中移除"""
-        group_id = get_value(event.message_obj, "group_id", None)
-        user_id = get_value(event.message_obj, "user_id", None)
+
+        raw_message = event.message_obj.raw_message
+
+        group_id = get_value(raw_message, "group_id")
+        user_id = get_value(raw_message, "user_id")
 
         client = event.bot
         logger.debug(f"获取用户 {user_id} 在群 {group_id} 的权限")
