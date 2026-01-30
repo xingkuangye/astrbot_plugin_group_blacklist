@@ -27,7 +27,7 @@ class MyPlugin(Star):
 
     @filter.permission_type(filter.PermissionType.ADMIN)
     @filter.command("unban")
-    async def unban(self, event: AstrMessageEvent,user_id: int):
+    async def unban(self, event: AstrMessageEvent,ban_user_id: int):
         """将用户从黑名单中移除"""
         group_id = get_value(event.message_obj, "group_id", None)
         user_id = get_value(event.message_obj, "user_id", None)
@@ -86,20 +86,20 @@ class MyPlugin(Star):
         else: 
             role = False
         if role:
-            for user_id in self.blacklist:
-                user_id = int(user_id)
-                await self.put_kv_data(user_id, True)
+            for ban_user_id in self.blacklist:
+                ban_user_id = int(ban_user_id)
+                await self.put_kv_data(ban_user_id, True)
             yield event.plain_result(f" 已刷新黑名单缓存，共 {len(self.blacklist)} 个用户被加入黑名单!")
 
     @filter.permission_type(filter.PermissionType.ADMIN)
     @filter.command("checkban")
-    async def checkban(self, event: AstrMessageEvent, user_id: int):
+    async def checkban(self, event: AstrMessageEvent, ban_user_id: int):
         """检查用户是否在黑名单中"""
-        user_status = await self.get_kv_data(user_id, False)
+        user_status = await self.get_kv_data(ban_user_id, False)
         if user_status:
-            yield event.plain_result(f"用户 {user_id} 在黑名单中。")
+            yield event.plain_result(f"用户 {ban_user_id} 在黑名单中。")
         else:
-            yield event.plain_result(f"用户 {user_id} 不在黑名单中。")
+            yield event.plain_result(f"用户 {ban_user_id} 不在黑名单中。")
 
     @filter.permission_type(filter.PermissionType.ADMIN)
     @filter.command("allow")
