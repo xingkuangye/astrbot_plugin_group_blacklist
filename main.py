@@ -129,6 +129,7 @@ class MyPlugin(Star):
                 logger.debug(f"收到加群请求事件，将由本插件处理")
                 group_id = get_value(raw_message, "group_id")
                 user_id = int(get_value(raw_message, "user_id"))
+                comment = get_value(raw_message, "comment")
                 flag= get_value(raw_message, "flag")
                 logger.debug(f"用户 {user_id} 申请加入群 {group_id}")
                 if str(group_id) in self.detect_groups:
@@ -172,8 +173,7 @@ class MyPlugin(Star):
                                 await client.api.call_action(
                                     'send_group_msg',
                                     group_id=int(notice_group),
-                                    message=f'''用户 {user_id} 申请加入群 {group_name}。\n
-                                        如需同意该请求，请点击下方 +1'''
+                                    message=f'''用户 {user_id} 申请加入群 {group_name}。\n请求信息: {comment}\n----------------\n如需同意该请求，请点击下方 +1'''
                                 )
 
                                 # 发送两次以自动产生 +1 按钮
