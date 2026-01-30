@@ -22,6 +22,7 @@ class MyPlugin(Star):
         self.detect_groups = [str(g) for g in config.get("detect_groups", []) or []]
         self.blacklist = [str(u) for u in config.get("blacklist", []) or []]
         self.targets_groups = [str(g) for g in config.get("target_groups", []) or []]
+        self.group_request_approve = config.get("group_request_approve")
         self.notice_groups = [str(g) for g in config.get("group_request_notice_groups", []) or []]
     
 
@@ -116,6 +117,18 @@ class MyPlugin(Star):
             logger.error(f"同意加群请求时出错: {e}")
             yield event.plain_result(f"同意加群请求时出错: {e}")
 
+    @filter.permission_type(filter.PermissionType.ADMIN)
+    @filter.command("dallow")
+    async def deny(self, event: AstrMessageEvent, flag: str):
+        '''快捷拒绝加群请求'''
+        client = event.bot
+        try:
+            await client.api.call_action('set_group_add_request', flag=flag, approve=False)
+            yield event.plain_result(f"已拒绝加群请求。")
+        except Exception as e:
+            logger.error(f"拒绝加群请求时出错: {e}")
+            yield event.plain_result(f"拒绝加群请求时出错: {e}")
+
     @filter.platform_adapter_type(PlatformAdapterType.AIOCQHTTP)
     @filter.event_message_type(filter.EventMessageType.ALL, priority=10)
     async def groupin(self, event: AstrMessageEvent):
@@ -159,7 +172,7 @@ class MyPlugin(Star):
                             logger.info(f"已拒绝用户 {user_id} 的加群请求")
                         except Exception as e:
                             logger.error(f"拒绝加群请求时出错: {e}")
-                    else:
+                    elif self.group_request_approve:
                         logger.debug(f"用户 {user_id} 不在黑名单中，允许加群请求")
                         logger.info(f"发送入群申请快捷处理条给目标用户")
                         client = event.bot
@@ -190,6 +203,8 @@ class MyPlugin(Star):
 
                         except Exception as e:
                             logger.error(f"发送加群请求通知时出错: {e}")
+                    else:
+                        logger.debug(f"用户 {user_id} 不在黑名单中，且加群审批功能未启用，忽略该加群请求")
                 else:
                     logger.debug(f"群 {group_id} 不在监控列表中，忽略该加群请求")
 
