@@ -13,7 +13,7 @@ def get_value(obj, key, default=None):
     
 
 
-@register("Group_Blacklist", "星星旁の旷野", "群黑名单插件", "0.5.0")
+@register("Group_Blacklist", "星星旁の旷野", "群黑名单插件", "1.0.0")
 class MyPlugin(Star):
 
     def __init__(self, context: Context, config: dict = None):
