@@ -1,6 +1,4 @@
-# AstrBot Plugin Group Blacklist
-
-# 群组黑名单插件
+# AstrBot Plugin Group Blacklist 跨群组黑名单插件
 
 ## 功能
 
