@@ -13,6 +13,6 @@
   },
   "group_request_notice_group": {
     "description": "接收加群请求通知的群组ID",
-    "type": "int"
+    "type": "list"
   }
 }

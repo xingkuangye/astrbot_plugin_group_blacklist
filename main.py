@@ -10,6 +10,8 @@ def get_value(obj, key, default=None):
         return getattr(obj, key, default)
     except Exception:
             return default
+    
+
 
 @register("Group_Blacklist", "星星旁の旷野", "群黑名单插件", "0.5.0")
 class MyPlugin(Star):
@@ -20,30 +22,74 @@ class MyPlugin(Star):
         self.detect_groups = [str(g) for g in config.get("detect_groups", []) or []]
         self.blacklist = [str(u) for u in config.get("blacklist", []) or []]
         self.targets_groups = [str(g) for g in config.get("target_groups", []) or []]
-        self.notice_group = config.get("group_request_notice_group",None)
+        self.notice_group = [str(g) for g in config.get("group_request_notice_group", []) or []]
+    
 
     @filter.permission_type(filter.PermissionType.ADMIN)
     @filter.command("unban")
     async def unban(self, event: AstrMessageEvent,user_id: int):
         """将用户从黑名单中移除"""
-        await self.put_kv_data(user_id, False)
-        yield event.plain_result(f" 已将 {user_id} 移出黑名单!")
+        group_id = get_value(event.message_obj, "group_id", None)
+        user_id = get_value(event.message_obj, "user_id", None)
 
-    @filter.permission_type(filter.PermissionType.ADMIN)
+        client = event.bot
+        logger.debug(f"获取用户 {user_id} 在群 {group_id} 的权限")
+        role = str(user_id)
+        member_info = await client.api.call_action('get_group_member_info', group_id=group_id, user_id=user_id)
+        role = get_value(member_info, "role", role)
+        if role in ["owner", "admin"]:
+           role = True
+        else: 
+            role = False
+        if role:
+            await self.put_kv_data(ban_user_id, False)
+            yield event.plain_result(f" 已将 {ban_user_id} 移出黑名单!")
+        else:
+            yield event.plain_result(f"无此权限")
+
     @filter.command("ban")
-    async def ban(self, event: AstrMessageEvent,user_id: int):
+    async def ban(self, event: AstrMessageEvent,ban_user_id: int):
         """将用户加入黑名单"""
-        await self.put_kv_data(user_id, True)
-        yield event.plain_result(f" 已将 {user_id} 加入黑名单!\n注意：该用户若已在群内不会被自动踢出，仅会被拒绝加群请求。")
+
+        group_id = get_value(event.message_obj, "group_id", None)
+        user_id = get_value(event.message_obj, "user_id", None)
+
+        client = event.bot
+        logger.debug(f"获取用户 {user_id} 在群 {group_id} 的权限")
+        role = str(user_id)
+        member_info = await client.api.call_action('get_group_member_info', group_id=group_id, user_id=user_id)
+        role = get_value(member_info, "role", role)
+        if role in ["owner", "admin"]:
+           role = True
+        else: 
+            role = False
+        if role:
+            await self.put_kv_data(ban_user_id, True)
+            yield event.plain_result(f" 已将 {ban_user_id} 加入黑名单!\n注意：该用户若已在群内不会被自动踢出，仅会被拒绝加群请求。")
+        else:
+            yield event.plain_result(f"无此权限")
 
     @filter.permission_type(filter.PermissionType.ADMIN)
     @filter.command("refresh")
     async def refresh(self, event: AstrMessageEvent):
         """刷新黑名单缓存"""
-        for user_id in self.blacklist:
-            user_id = int(user_id)
-            await self.put_kv_data(user_id, True)
-        yield event.plain_result(f" 已刷新黑名单缓存，共 {len(self.blacklist)} 个用户被加入黑名单!")
+        group_id = get_value(event.message_obj, "group_id", None)
+        user_id = get_value(event.message_obj, "user_id", None)
+
+        client = event.bot
+        logger.debug(f"获取用户 {user_id} 在群 {group_id} 的权限")
+        role = str(user_id)
+        member_info = await client.api.call_action('get_group_member_info', group_id=group_id, user_id=user_id)
+        role = get_value(member_info, "role", role)
+        if role in ["owner", "admin"]:
+           role = True
+        else: 
+            role = False
+        if role:
+            for user_id in self.blacklist:
+                user_id = int(user_id)
+                await self.put_kv_data(user_id, True)
+            yield event.plain_result(f" 已刷新黑名单缓存，共 {len(self.blacklist)} 个用户被加入黑名单!")
 
     @filter.permission_type(filter.PermissionType.ADMIN)
     @filter.command("checkban")
