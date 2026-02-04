@@ -185,7 +185,7 @@ class MyPlugin(Star):
                                 if word in comment:
                                     logger.info(f"用户 {user_id} 的加群请求包含白名单关键词 '{word}'，自动同意加群请求")
                                     for notice_group in self.notice_groups:
-                                        await client.api.call_action('send_group_msg', group=int(notice_group), message=f"用户 {user_id} 的加群请求包含白名单关键词 '{word}'，已自动同意其加群请求。")
+                                        await client.api.call_action('send_group_msg', group_id=int(notice_group), message=f"用户 {user_id} 的加群请求包含白名单关键词 '{word}'，已自动同意其加群请求。")
                                     await client.api.call_action('set_group_add_request', flag=flag, approve=True)
                                     return
 
