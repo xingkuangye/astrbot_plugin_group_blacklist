@@ -19,5 +19,9 @@
   "group_request_notice_groups": {
     "description": "接收加群请求通知的群组ID",
     "type": "list"
+  },
+  "white_word_list": {
+    "description": "加群请求白名单关键词列表",
+    "type": "list"
   }
 }

@@ -24,6 +24,7 @@ class MyPlugin(Star):
         self.targets_groups = [str(g) for g in config.get("target_groups", []) or []]
         self.group_request_approve = config.get("group_request_approve")
         self.notice_groups = [str(g) for g in config.get("group_request_notice_groups", []) or []]
+        self.white_word_list = [str(w) for w in config.get("white_word_list", []) or []]
     
 
     @filter.permission_type(filter.PermissionType.ADMIN)
@@ -180,6 +181,13 @@ class MyPlugin(Star):
                             group_info = await client.api.call_action('get_group_info', group_id=int(group_id))
                             group_name = str(group_id)
                             group_name = group_info.get('group_name', group_name)
+                            for word in self.white_word_list:
+                                if word in comment:
+                                    logger.info(f"用户 {user_id} 的加群请求包含白名单关键词 '{word}'，自动同意加群请求")
+                                    for notice_group in self.notice_groups:
+                                        await client.api.call_action('send_group_msg', group=int(notice_group), message=f"用户 {user_id} 的加群请求包含白名单关键词 '{word}'，已自动同意其加群请求。")
+                                    await client.api.call_action('set_group_add_request', flag=flag, approve=True)
+                                    return
 
                             for notice_group in self.notice_groups:
                                 logger.debug(f"正在发送加群请求通知给用户 {notice_group}")
